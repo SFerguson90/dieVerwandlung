@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserInfo } from '../model/user-info';
 
 @Component({
   selector: 'app-nav',
@@ -14,6 +15,41 @@ import { Component } from '@angular/core';
         </a>
       </ul>
     </nav>
+
+    <nav class="menu auth">
+      <p class="menu-label">Auth</p>
+      <div class="menu-list auth">
+        <ng-container *ngIf="!userInfo; else logout">
+          <ng-container *ngFor="let provider of providers">
+            <a href="/.auth/login/{{provider}}?post_login_redirect_uri={{redirect}}">{{provider}}</a>
+          </ng-container>
+        </ng-container>
+        <ng-template #logout>
+          <a href="/.auth/logout?post_logout_redirect_uri={{redirect}}">Logout</a>
+        </ng-template>
+      </div>
+    </nav>
   `,
 })
-export class NavComponent {}
+export class NavComponent {
+
+  userInfo: UserInfo;
+  providers = ['twitter','github','aad'];
+  redirect = window.location.pathname;
+
+  async ngOnInit() {
+    this.userInfo = await this.getUserInfo();
+  }
+
+  async getUserInfo() {
+    try {
+      const response = await fetch('/.auth/me');
+      const payload = await response.json();
+      const { clientPrincipal } = payload;
+      return clientPrincipal;
+    } catch (error) {
+      console.error('No profile could be found');
+      return undefined;
+    }
+  }
+}
