@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserInfo } from '../model/user-info';
 
 @Component({
@@ -15,7 +15,6 @@ import { UserInfo } from '../model/user-info';
         </a>
       </ul>
     </nav>
-
     <nav class="menu auth">
       <p class="menu-label">Auth</p>
       <div class="menu-list auth">
@@ -29,13 +28,17 @@ import { UserInfo } from '../model/user-info';
         </ng-template>
       </div>
     </nav>
+    <div class="user" *ngIf="userInfo">
+      <p>Welcome</p>
+      <p>{{ userInfo?.userDetails }}</p>
+      <p>{{ userInfo?.identityProvider }}</p>
+    </div>
   `,
 })
-export class NavComponent {
-
-  userInfo: UserInfo;
-  providers = ['twitter','github','aad'];
+export class NavComponent implements OnInit {
+  providers = ['Twitter', 'GitHub', 'AAD', 'Google','Facebook'];
   redirect = window.location.pathname;
+  userInfo: UserInfo;
 
   async ngOnInit() {
     this.userInfo = await this.getUserInfo();
